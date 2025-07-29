@@ -1,16 +1,15 @@
 <?php  
-$sName = getenv('DB_HOST') ?: 'localhost';
-$uName = getenv('DB_USERNAME') ?: 'root';
-$pass  = getenv('DB_PASSWORD') ?: '';
-$db_name = getenv('DB_NAME') ?: 'task_management_db';
+$sName = '127.0.0.1';         // hoặc localhost nếu vẫn chạy tốt
+$uName = 'root';              // tài khoản MySQL
+$pass  = '';                  // để trống nếu chưa đặt mật khẩu
+$db_name = 'task_management_db';  // tên cơ sở dữ liệu
 
 try {
-    // ĐÃ SỬA: mysql thay vì pgsql
     $conn = new PDO("mysql:host=$sName;dbname=$db_name;charset=utf8", $uName, $pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "Connected successfully!";
+    echo "✅ Connected successfully to local database!";
 } catch (PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
+    echo "❌ Connection failed: " . $e->getMessage();
     exit;
 }
 ?>
