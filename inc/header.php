@@ -62,16 +62,7 @@
         cursor: pointer;
     }
 
-    #notificationNum {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: red;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 6px;
-        font-size: 12px;
-    }
+    
 
     .notification-bar {
         display: none;
@@ -94,9 +85,9 @@
     background: red;
     color: white;
     border-radius: 50%;
-    padding: 10px 6px;
+   
     font-size: 12px;
-    left: 10px;
+ 
 }
 
     .notification-bar.open-notification {

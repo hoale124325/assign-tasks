@@ -51,6 +51,7 @@
                         <span>Thông báo</span>
                     </a>
                 </li>
+                
             </ul>
         </div>
         
@@ -100,6 +101,12 @@
                         <i class="fas fa-tasks"></i>
                         <span>Tất cả công việc</span>
                     </a>
+                </li>
+                <li>
+                   <a href="<?php echo $base_path ?? ''; ?>statistical.php" data-tooltip="Tất cả công việc">
+    <i class="fas fa-chart-line"></i>
+    <span>Thống kê</span>
+</a>
                 </li>
             </ul>
         </div>

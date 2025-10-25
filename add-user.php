@@ -50,168 +50,154 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thêm Người Dùng</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); }
-        .input-focus:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
-        .file-upload { position: relative; overflow: hidden; display: inline-block; cursor: pointer; }
-        .file-upload input[type=file] { position: absolute; left: -9999px; }
-        .avatar-preview { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #e5e7eb; }
-    </style>
+    <title>Thêm Người Dùng | Hệ thống Quản lý</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen">
-    <div class="flex">
-        <?php include "inc/nav.php" ?>
+<body class="admin-add-user">
+    <div class="app-container">
+        <?php include "inc/nav.php"; ?>
         
-        <div class="flex-1 p-4 lg:p-8">
-            <!-- Header Section -->
-            <div class="mb-8">
-                <div class="flex items-center gap-4 mb-4">
-                    <a href="user.php" class="w-10 h-10 bg-gray-200 rounded-xl flex items-center justify-center hover:bg-gray-300 transition-colors">
-                        <i class="fas fa-arrow-left text-gray-600"></i>
-                    </a>
+        <div class="main-content">
+            <div class="content-wrapper">
+                <!-- Page Header -->
+                <header class="page-header">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                            <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
-                                <i class="fas fa-user-plus text-white text-lg"></i>
-                            </div>
-                            Thêm Người Dùng Mới
-                        </h1>
-                        <p class="text-gray-600 mt-1">Điền thông tin để tạo tài khoản người dùng mới</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Error Message -->
-            <?php if (isset($_GET['error'])) { ?>
-                <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-center gap-3">
-                    <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                        <i class="fas fa-exclamation-triangle text-white text-sm"></i>
-                    </div>
-                    <span class="text-red-700 font-medium"><?php echo htmlspecialchars(stripcslashes($_GET['error'])); ?></span>
-                </div>
-            <?php } ?>
-
-            <!-- Form Card -->
-            <div class="max-w-2xl mx-auto">
-                <div class="glass-effect rounded-2xl shadow-xl p-8">
-                    <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                        <!-- Avatar Upload -->
-                        <div class="flex flex-col items-center mb-8">
-                            <div class="relative mb-4">
-                                <img id="avatarPreview" src="img/default-avatar.png" alt="Avatar Preview" class="avatar-preview">
-                                <div class="absolute -bottom-2 -right-2 w-8 h-8 gradient-bg rounded-full flex items-center justify-center cursor-pointer" onclick="document.getElementById('avatar').click()">
-                                    <i class="fas fa-camera text-white text-sm"></i>
-                                </div>
-                            </div>
-                            <input type="file" id="avatar" name="avatar" accept="image/*" class="hidden" onchange="previewAvatar(this)">
-                            <p class="text-sm text-gray-500">Nhấp vào biểu tượng máy ảnh để tải lên avatar</p>
-                        </div>
-
-                        <!-- Form Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Họ và Tên -->
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-user mr-2 text-gray-400"></i>Họ và Tên *
-                                </label>
-                                <input type="text" name="full_name" required 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl input-focus transition-all duration-200"
-                                       placeholder="Nhập họ và tên đầy đủ">
-                            </div>
-
-                            <!-- Tên Đăng Nhập -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-at mr-2 text-gray-400"></i>Tên Đăng Nhập *
-                                </label>
-                                <input type="text" name="username" required 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl input-focus transition-all duration-200"
-                                       placeholder="username">
-                            </div>
-
-                            <!-- Email -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-envelope mr-2 text-gray-400"></i>Email *
-                                </label>
-                                <input type="email" name="email" required 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl input-focus transition-all duration-200"
-                                       placeholder="example@email.com">
-                            </div>
-
-                            <!-- Số Điện Thoại -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-phone mr-2 text-gray-400"></i>Số Điện Thoại
-                                </label>
-                                <input type="text" name="phone_number" 
-                                       class="w-full px-4 py-3 border border-gray-300 rounded-xl input-focus transition-all duration-200"
-                                       placeholder="0123456789">
-                            </div>
-
-                            <!-- Vai Trò -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-user-shield mr-2 text-gray-400"></i>Vai Trò *
-                                </label>
-                                <select name="role" required 
-                                        class="w-full px-4 py-3 border border-gray-300 rounded-xl input-focus transition-all duration-200">
-                                    <option value="employee">
-                                        <i class="fas fa-user-tie"></i> Nhân Viên
-                                    </option>
-                                    <option value="admin">
-                                        <i class="fas fa-crown"></i> Quản Trị Viên
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Mật Khẩu -->
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-lock mr-2 text-gray-400"></i>Mật Khẩu *
-                                </label>
-                                <div class="relative">
-                                    <input type="password" id="password" name="password" required 
-                                           class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl input-focus transition-all duration-200"
-                                           placeholder="Nhập mật khẩu mạnh">
-                                    <button type="button" onclick="togglePassword()" 
-                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                        <i id="passwordIcon" class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1">Mật khẩu nên có ít nhất 8 ký tự</p>
-                            </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                            <button type="submit" 
-                                    class="flex-1 gradient-bg text-white px-6 py-3 rounded-xl hover:shadow-lg transition-all duration-300 font-medium flex items-center justify-center gap-2">
-                                <i class="fas fa-plus"></i>
-                                Tạo Người Dùng
-                            </button>
-                            <a href="user.php" 
-                               class="flex-1 bg-gray-200 text-gray-800 px-6 py-3 rounded-xl hover:bg-gray-300 transition-all duration-300 font-medium flex items-center justify-center gap-2">
-                                <i class="fas fa-times"></i>
-                                Hủy Bỏ
+                        <div class="header-flex">
+                            <a href="user.php" class="back-button">
+                                <i class="fas fa-arrow-left"></i>
                             </a>
+                            <h1 class="page-title">
+                                <i class="fas fa-user-plus"></i>
+                                Thêm Người Dùng Mới
+                            </h1>
                         </div>
-                    </form>
+                        <p class="page-description">Thêm tài khoản người dùng mới vào hệ thống</p>
+                    </div>
+                </header>
+
+                <!-- Error Message -->
+                <?php if (isset($_GET['error'])) { ?>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span><?php echo htmlspecialchars($_GET['error']); ?></span>
+                    </div>
+                <?php } ?>
+
+                <!-- Form Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin người dùng</h2>
+                    </div>
+                    
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data" class="user-form">
+                            <!-- Avatar Upload -->
+                            <div class="avatar-upload">
+                                <div class="avatar-preview-container">
+                                    <img id="avatarPreview" src="img/default-avatar.png" alt="Avatar Preview" class="avatar-preview">
+                                    <div class="avatar-change" onclick="document.getElementById('avatar').click()">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                </div>
+                                <input type="file" id="avatar" name="avatar" accept="image/*" class="hidden" onchange="previewAvatar(this)">
+                                <p class="avatar-upload-text">Nhấn để thay đổi ảnh đại diện</p>
+                            </div>
+
+                            <!-- Form Grid -->
+                            <div class="form-grid">
+                                <!-- Full Name -->
+                                <div class="form-group full-width">
+                                    <label class="form-label">
+                                        <i class="fas fa-user"></i>Họ và tên *
+                                    </label>
+                                    <input type="text" name="full_name" required 
+                                           class="form-control" 
+                                           placeholder="Nhập họ và tên đầy đủ">
+                                </div>
+
+                                <!-- Username -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-at"></i>Tên đăng nhập *
+                                    </label>
+                                    <input type="text" name="username" required 
+                                           class="form-control" 
+                                           placeholder="username">
+                                    <p class="form-text">Tên đăng nhập không dấu, không khoảng cách</p>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-envelope"></i>Email *
+                                    </label>
+                                    <input type="email" name="email" required 
+                                           class="form-control" 
+                                           placeholder="example@email.com">
+                                </div>
+
+                                <!-- Phone Number -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-phone"></i>Số điện thoại
+                                    </label>
+                                    <input type="text" name="phone_number" 
+                                           class="form-control" 
+                                           placeholder="0123456789">
+                                </div>
+
+                                <!-- Role -->
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-user-tag"></i>Vai trò *
+                                    </label>
+                                    <select name="role" required class="form-control">
+                                        <option value="employee">Nhân viên</option>
+                                        <option value="admin">Quản trị viên</option>
+                                    </select>
+                                </div>
+
+                                <!-- Password -->
+                                <div class="form-group full-width">
+                                    <label class="form-label">
+                                        <i class="fas fa-lock"></i>Mật khẩu *
+                                    </label>
+                                    <div class="password-wrapper">
+                                        <input type="password" id="password" name="password" required 
+                                               class="form-control" 
+                                               placeholder="Nhập mật khẩu">
+                                        <span class="password-toggle" onclick="togglePassword()">
+                                            <i id="passwordIcon" class="fas fa-eye"></i>
+                                        </span>
+                                    </div>
+                                    <p class="form-text">Mật khẩu phải có ít nhất 8 ký tự</p>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Lưu Người Dùng
+                                </button>
+                                <a href="user.php" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Hủy Bỏ
+                                </a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const active = document.querySelector("#navList li:nth-child(2)");
-        if (active) {
-            active.classList.add("active");
+        // Set active nav item
+        const activeNavItem = document.querySelector("#navList li:nth-child(2)");
+        if (activeNavItem) {
+            activeNavItem.classList.add("active");
         }
 
+        // Avatar preview
         function previewAvatar(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -222,6 +208,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
             }
         }
 
+        // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const passwordIcon = document.getElementById('passwordIcon');
@@ -238,13 +225,347 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
         // Form validation
         document.querySelector('form').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
-            if (password.length < 3) {
+            if (password.length < 8) {
                 e.preventDefault();
-                alert('Mật khẩu phải có ít nhất 3 ký tự');
+                alert('Mật khẩu phải có ít nhất 8 ký tự');
                 return false;
             }
         });
     </script>
+
+    <style>
+        /* Base Styles */
+        .admin-add-user {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Header Styles */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .header-flex {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0;
+        }
+
+        .page-title i {
+            color: #4f46e5;
+            font-size: 1.5rem;
+        }
+
+        .page-description {
+            color: #374151;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .back-button {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #4b5563;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            max-width: 48rem;
+            margin: 0 auto;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Styles */
+        .user-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: #9ca3af;
+            font-size: 1rem;
+            width: 1rem;
+            text-align: center;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background-color: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .form-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        /* Avatar Upload */
+        .avatar-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .avatar-preview-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .avatar-preview {
+            width: 6rem;
+            height: 6rem;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e5e7eb;
+        }
+
+        .avatar-change {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 2rem;
+            height: 2rem;
+            background-color: #4f46e5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        .avatar-change i {
+            font-size: 0.75rem;
+        }
+
+        .avatar-upload-text {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .hidden {
+            position: absolute;
+            left: -9999px;
+        }
+
+        /* Password Toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: pointer;
+        }
+
+        .password-toggle:hover {
+            color: #4b5563;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #6366f1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
+        /* Alert Styles */
+        .alert {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-danger {
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-left: 4px solid #dc2626;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        @media (min-width: 640px) {
+            .form-actions {
+                flex-direction: row;
+            }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 640px) {
+            .content-wrapper {
+                padding: 1rem;
+            }
+            
+            .card {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+        }
+    </style>
 </body>
 </html>
 <?php } else {

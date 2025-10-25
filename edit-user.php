@@ -82,9 +82,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
                     </a>
                     <div>
                         <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                            <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
-                                <i class="fas fa-user-edit text-white text-lg"></i>
-                            </div>
+                            
                             Chỉnh Sửa Người Dùng
                         </h1>
                         <p class="text-gray-600 mt-1">Cập nhật thông tin cho: <strong><?php echo htmlspecialchars($user['full_name']); ?></strong></p>

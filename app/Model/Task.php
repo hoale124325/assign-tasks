@@ -2,20 +2,29 @@
 
 function insert_task($conn, $data) {
     try {
-        $sql = "INSERT INTO tasks (title, description, assigned_to, due_date, status) VALUES(?,?,?,?,?)";
+        // Kiểm tra số lượng tham số, giả sử $data là [title, description, assigned_to, due_date, attachment]
+        if (count($data) < 4 || count($data) > 5) {
+            throw new Exception("Số lượng tham số không đúng cho insert_task");
+        }
+        $attachment = isset($data[4]) ? $data[4] : null; // Nếu không có attachment, gán null
+        $sql = "INSERT INTO tasks (title, description, assigned_to, due_date, attachment, status) VALUES(?,?,?,?,?,?)";
         $stmt = $conn->prepare($sql);
-        $stmt->execute(array_merge($data, ['pending'])); // Giả sử $data là [title, description, assigned_to, due_date]
-    } catch (PDOException $e) {
-        // Ghi log lỗi hoặc xử lý theo cách phù hợp
+        $status = 'pending'; // Giá trị mặc định cho status
+        $stmt->execute(array_merge(array_slice($data, 0, 4), [$attachment, $status]));
+    } catch (PDOException | Exception $e) {
         error_log("Lỗi insert_task: " . $e->getMessage());
         return false;
     }
     return true;
 }
 
-function get_all_tasks($conn) {
+function get_all_tasks($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT * FROM tasks WHERE status != 'completed' ORDER BY id DESC";
+        $sql = "SELECT * FROM tasks";
+        if (!$include_completed) {
+            $sql .= " WHERE status != 'completed'";
+        }
+        $sql .= " ORDER BY id DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
 
@@ -31,9 +40,13 @@ function get_all_tasks($conn) {
     return $tasks;
 }
 
-function get_all_tasks_due_today($conn) {
+function get_all_tasks_due_today($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT * FROM tasks WHERE due_date = CURDATE() AND status != 'completed' ORDER BY id DESC";
+        $sql = "SELECT * FROM tasks WHERE due_date = CURDATE()";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
+        $sql .= " ORDER BY id DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
 
@@ -49,9 +62,12 @@ function get_all_tasks_due_today($conn) {
     return $tasks;
 }
 
-function count_tasks_due_today($conn) {
+function count_tasks_due_today($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT id FROM tasks WHERE due_date = CURDATE() AND status != 'completed'";
+        $sql = "SELECT id FROM tasks WHERE due_date = CURDATE()";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
         return $stmt->rowCount();
@@ -61,9 +77,13 @@ function count_tasks_due_today($conn) {
     }
 }
 
-function get_all_tasks_overdue($conn) {
+function get_all_tasks_overdue($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT * FROM tasks WHERE due_date < CURDATE() AND status != 'completed' ORDER BY id DESC";
+        $sql = "SELECT * FROM tasks WHERE due_date < CURDATE()";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
+        $sql .= " ORDER BY id DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
 
@@ -79,9 +99,12 @@ function get_all_tasks_overdue($conn) {
     return $tasks;
 }
 
-function count_tasks_overdue($conn) {
+function count_tasks_overdue($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT id FROM tasks WHERE due_date < CURDATE() AND status != 'completed'";
+        $sql = "SELECT id FROM tasks WHERE due_date < CURDATE()";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
         return $stmt->rowCount();
@@ -91,9 +114,13 @@ function count_tasks_overdue($conn) {
     }
 }
 
-function get_all_tasks_NoDeadline($conn) {
+function get_all_tasks_NoDeadline($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT * FROM tasks WHERE status != 'completed' AND (due_date IS NULL OR due_date = '0000-00-00') ORDER BY id DESC";
+        $sql = "SELECT * FROM tasks WHERE (due_date IS NULL OR due_date = '0000-00-00')";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
+        $sql .= " ORDER BY id DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
 
@@ -109,9 +136,12 @@ function get_all_tasks_NoDeadline($conn) {
     return $tasks;
 }
 
-function count_tasks_NoDeadline($conn) {
+function count_tasks_NoDeadline($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT id FROM tasks WHERE status != 'completed' AND (due_date IS NULL OR due_date = '0000-00-00')";
+        $sql = "SELECT id FROM tasks WHERE (due_date IS NULL OR due_date = '0000-00-00')";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
         return $stmt->rowCount();
@@ -151,9 +181,12 @@ function get_task_by_id($conn, $id) {
     return $task;
 }
 
-function count_tasks($conn) {
+function count_tasks($conn, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT id FROM tasks WHERE status != 'completed'";
+        $sql = "SELECT id FROM tasks";
+        if (!$include_completed) {
+            $sql .= " WHERE status != 'completed'";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->execute([]);
         return $stmt->rowCount();
@@ -182,6 +215,16 @@ function update_task_status($conn, $data) {
     try {
         $sql = "UPDATE tasks SET status=? WHERE id=?";
         $stmt = $conn->prepare($sql);
+        $status = $data[0];
+        $id = $data[1];
+
+        // Kiểm tra giá trị status hợp lệ với enum
+        $valid_statuses = ['pending', 'in_progress', 'completed'];
+        if (!in_array($status, $valid_statuses)) {
+            error_log("Invalid status value: $status");
+            return false;
+        }
+
         $stmt->execute($data);
     } catch (PDOException $e) {
         error_log("Lỗi update_task_status: " . $e->getMessage());
@@ -190,9 +233,13 @@ function update_task_status($conn, $data) {
     return true;
 }
 
-function get_all_tasks_by_id($conn, $id) {
+function get_all_tasks_by_id($conn, $id, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT * FROM tasks WHERE assigned_to=? AND status != 'completed' ORDER BY id DESC";
+        $sql = "SELECT * FROM tasks WHERE assigned_to=?";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
+        $sql .= " ORDER BY id DESC";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$id]);
 
@@ -244,9 +291,12 @@ function count_completed_tasks($conn) {
     }
 }
 
-function count_my_tasks($conn, $id) {
+function count_my_tasks($conn, $id, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT id FROM tasks WHERE assigned_to=? AND status != 'completed'";
+        $sql = "SELECT id FROM tasks WHERE assigned_to=?";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->execute([$id]);
         return $stmt->rowCount();
@@ -256,9 +306,12 @@ function count_my_tasks($conn, $id) {
     }
 }
 
-function count_my_tasks_overdue($conn, $id) {
+function count_my_tasks_overdue($conn, $id, $include_completed = false) { // Thêm tham số $include_completed
     try {
         $sql = "SELECT id FROM tasks WHERE due_date < CURDATE() AND status != 'completed' AND assigned_to=? AND due_date != '0000-00-00'";
+        if ($include_completed) {
+            $sql = "SELECT id FROM tasks WHERE due_date < CURDATE() AND assigned_to=? AND due_date != '0000-00-00'";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->execute([$id]);
         return $stmt->rowCount();
@@ -268,9 +321,12 @@ function count_my_tasks_overdue($conn, $id) {
     }
 }
 
-function count_my_tasks_NoDeadline($conn, $id) {
+function count_my_tasks_NoDeadline($conn, $id, $include_completed = false) { // Thêm tham số $include_completed
     try {
-        $sql = "SELECT id FROM tasks WHERE assigned_to=? AND status != 'completed' AND (due_date IS NULL OR due_date = '0000-00-00')";
+        $sql = "SELECT id FROM tasks WHERE assigned_to=? AND (due_date IS NULL OR due_date = '0000-00-00')";
+        if (!$include_completed) {
+            $sql .= " AND status != 'completed'";
+        }
         $stmt = $conn->prepare($sql);
         $stmt->execute([$id]);
         return $stmt->rowCount();
@@ -315,3 +371,21 @@ function count_my_completed_tasks($conn, $id) {
         return 0;
     }
 }
+
+// Hàm mới để cập nhật cả status và completed_file
+function update_task_with_file($conn, $data) {
+    try {
+        if (count($data) != 3) {
+            throw new Exception("Số lượng tham số không đúng cho update_task_with_file");
+        }
+        $sql = "UPDATE tasks SET status=?, completed_file=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($data); // Giả sử $data là [status, completed_file, id]
+    } catch (PDOException | Exception $e) {
+        error_log("Lỗi update_task_with_file: " . $e->getMessage());
+        return false;
+    }
+    return true;
+}
+
+?>

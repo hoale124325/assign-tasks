@@ -15,7 +15,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
         $greeting = 'Chào buổi sáng';
     } elseif ($hour < 18) {
         $greeting = 'Chào buổi chiều';
-    } else { // Sửa lỗi syntax ở đây
+    } else {
         $greeting = 'Chào buổi tối';
     }
 
@@ -75,7 +75,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
 
             <?php if ($_SESSION['role'] == "admin") { ?>
                 <div class="dashboard">
-                    <div class="dashboard-item item-1 card1" data-aos="fade-up" data-aos-delay="100">
+                    <a href="user.php" class="dashboard-item item-1 card1" data-aos="fade-up" data-aos-delay="100">
                         <div class="dashboard-icon">
                             <i class="fa fa-users"></i>
                         </div>
@@ -84,9 +84,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-label">Nhân Viên</div>
                         </div>
                         <div class="dashboard-decoration"><i class="fa fa-arrow-up"></i></div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-2 card2" data-aos="fade-up" data-aos-delay="200">
+                    <a href="tasks.php" class="dashboard-item item-2 card2" data-aos="fade-up" data-aos-delay="200">
                         <div class="dashboard-icon">
                             <i class="fa fa-tasks"></i>
                         </div>
@@ -95,10 +95,10 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-label">Tất Cả Nhiệm Vụ</div>
                         </div>
                         <div class="dashboard-decoration"><i class="fa fa-heart"></i></div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-3 warning card3" data-aos="fade-up" data-aos-delay="300">
-                        <div class="dashboard-icon"> <!-- Sửa lỗi tag không đóng -->
+                    <a href="tasks.php" class="dashboard-item item-3 warning card3" data-aos="fade-up" data-aos-delay="300">
+                        <div class="dashboard-icon">
                             <i class="fa fa-exclamation-triangle"></i>
                         </div>
                         <div class="dashboard-content">
@@ -108,9 +108,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                         <?php if ($overdue_task > 0): ?>
                         <div class="pulse-animation"></div>
                         <?php endif; ?>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-4 card4" data-aos="fade-up" data-aos-delay="400">
+                    <a href="tasks.php" class="dashboard-item item-4 card4" data-aos="fade-up" data-aos-delay="400">
                         <div class="dashboard-icon">
                             <i class="fa fa-clock-o"></i>
                         </div>
@@ -118,9 +118,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-number"><?= number_format($nodeadline_task) ?></div>
                             <div class="dashboard-label">Không Có Hạn Chót</div>
                         </div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-5 urgent card5" data-aos="fade-up" data-aos-delay="500">
+                    <a href="tasks.php" class="dashboard-item item-5 urgent card5" data-aos="fade-up" data-aos-delay="500">
                         <div class="dashboard-icon">
                             <i class="fa fa-calendar-check-o"></i>
                         </div>
@@ -131,9 +131,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                         <?php if ($todaydue_task > 0): ?>
                         <div class="pulse-animation orange"></div>
                         <?php endif; ?>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-6 card6" data-aos="fade-up" data-aos-delay="600">
+                    <a href="notifications.php" class="dashboard-item item-6 card6" data-aos="fade-up" data-aos-delay="600">
                         <div class="dashboard-icon">
                             <i class="fa fa-bell"></i>
                         </div>
@@ -144,9 +144,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                         <?php if ($overdue_task > 0): ?>
                         <div class="notification-badge"><?= number_format($overdue_task) ?></div>
                         <?php endif; ?>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-7 pending card7" data-aos="fade-up" data-aos-delay="700">
+                    <a href="tasks.php" class="dashboard-item item-7 pending card7" data-aos="fade-up" data-aos-delay="700">
                         <div class="dashboard-icon">
                             <i class="fa fa-hourglass-start"></i>
                         </div>
@@ -154,9 +154,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-number"><?= number_format($pending) ?></div>
                             <div class="dashboard-label">Đang Chờ</div>
                         </div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-8 progress card8" data-aos="fade-up" data-aos-delay="800">
+                    <a href="tasks.php" class="dashboard-item item-8 progress card8" data-aos="fade-up" data-aos-delay="800">
                         <div class="dashboard-icon">
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
@@ -167,9 +167,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: <?= $num_task > 0 ? ($in_progress / $num_task) * 100 : 0 ?>%"></div>
                         </div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-9 success card9" data-aos="fade-up" data-aos-delay="900">
+                    <a href="tasks.php" class="dashboard-item item-9 success card9" data-aos="fade-up" data-aos-delay="900">
                         <div class="dashboard-icon">
                             <i class="fa fa-check-circle"></i>
                         </div>
@@ -180,11 +180,11 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                         <div class="success-checkmark">
                             <i class="fa fa-check"></i>
                         </div>
-                    </div>
+                    </a>
                 </div>
             <?php } else { ?>
-                <div class="dashboard user-dashboard"> <!-- Thêm class phân biệt -->
-                    <div class="dashboard-item item-1 card1" data-aos="fade-up" data-aos-delay="100">
+                <div class="dashboard user-dashboard">
+                    <a href="my_task.php" class="dashboard-item item-1 card1" data-aos="fade-up" data-aos-delay="100">
                         <div class="dashboard-icon">
                             <i class="fa fa-tasks"></i>
                         </div>
@@ -193,9 +193,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-label">Nhiệm Vụ Của Tôi</div>
                         </div>
                         <div class="dashboard-decoration"><i class="fa fa-user"></i></div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-2 warning card2" data-aos="fade-up" data-aos-delay="200">
+                    <a href="my_task.php" class="dashboard-item item-2 warning card2" data-aos="fade-up" data-aos-delay="200">
                         <div class="dashboard-icon">
                             <i class="fa fa-exclamation-triangle"></i>
                         </div>
@@ -207,9 +207,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                         <div class="pulse-animation"></div>
                         <?php endif; ?>
                         <div class="dashboard-decoration"><i class="fa fa-heart"></i></div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-3 card3" data-aos="fade-up" data-aos-delay="300"> <!-- Sửa attribute bị cắt -->
+                    <a href="my_task.php" class="dashboard-item item-3 card3" data-aos="fade-up" data-aos-delay="300">
                         <div class="dashboard-icon">
                             <i class="fa fa-clock-o"></i>
                         </div>
@@ -217,9 +217,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-number"><?= number_format($nodeadline_task) ?></div>
                             <div class="dashboard-label">Không Có Hạn Chót</div>
                         </div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-4 pending card4" data-aos="fade-up" data-aos-delay="400">
+                    <a href="my_task.php" class="dashboard-item item-4 pending card4" data-aos="fade-up" data-aos-delay="400">
                         <div class="dashboard-icon">
                             <i class="fa fa-hourglass-start"></i>
                         </div>
@@ -227,9 +227,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-number"><?= number_format($pending) ?></div>
                             <div class="dashboard-label">Đang Chờ</div>
                         </div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-5 progress card5" data-aos="fade-up" data-aos-delay="500">
+                    <a href="my_task.php" class="dashboard-item item-5 progress card5" data-aos="fade-up" data-aos-delay="500">
                         <div class="dashboard-icon">
                             <i class="fa fa-spinner fa-spin"></i>
                         </div>
@@ -240,9 +240,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: <?= $num_my_task > 0 ? ($in_progress / $num_my_task) * 100 : 0 ?>%"></div>
                         </div>
-                    </div>
+                    </a>
                     
-                    <div class="dashboard-item item-6 success card6" data-aos="fade-up" data-aos-delay="600">
+                    <a href="my_task.php" class="dashboard-item item-6 success card6" data-aos="fade-up" data-aos-delay="600">
                         <div class="dashboard-icon">
                             <i class="fa fa-check-circle"></i>
                         </div>
@@ -250,13 +250,11 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             <div class="dashboard-number"><?= number_format($completed) ?></div>
                             <div class="dashboard-label">Hoàn Thành</div>
                         </div>
-                        <div class="completion-percentage">
-                            <?= $num_my_task > 0 ? round(($completed / $num_my_task) * 100, 1) : 0 ?>%
-                        </div>
+                        
                         <div class="success-checkmark">
                             <i class="fa fa-check"></i>
                         </div>
-                    </div>
+                    </a>
                 </div>
             <?php } ?>
         </section>
@@ -265,17 +263,31 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
 <style>
     .section-1 {
         width: 100%;
-            background:  rgba(255, 255, 255, 0.95);
+        background: rgba(255, 255, 255, 0.95);
         min-height: calc(100vh - 80px);
         padding: 30px 20px;
     }
     .side-bar ul li:hover {
-    background: none;
+        background: none;
     }
 
     * {
         font-family: 'Quicksand', sans-serif;
         box-sizing: border-box;
+    }
+    .nav-list a {
+        gap: 15px;
+        padding: 14px 15px;
+        color: #b0b0b0;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+    .side-bar ul li {
+        padding: 10px 0px;
     }
 
     /* Greeting Section */
@@ -288,6 +300,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255,255,255,0.2);
         width: 100%;
+        margin-top: -20px;
     }
 
     .greeting-section h2 {
@@ -305,7 +318,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
 
     /* Dashboard Grid */
     .dashboard {
-        
+        display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 5px;
         max-width: 1400px;
@@ -321,6 +334,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
     .dashboard-item {
         background: rgba(255, 255, 255, 0.95);
         border-radius: 20px;
+        display: flex;
         align-items: center;
         justify-content: space-between;
         position: relative;
@@ -330,6 +344,9 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
         box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255,255,255,0.2);
+        text-decoration: none;
+        color: inherit;
+        padding: 20px;
     }
 
     .dashboard-item:hover {
@@ -344,16 +361,14 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
         left: 0;
         right: 0;
         height: 5px;
-        
         transition: height 0.3s ease;
-        Width: 300px;
+        width: 300px;
     }
 
     .dashboard-item:hover::before {
         height: 8px;
     }
 
-    /* Card Colors - Neutral tones */
     /* Card Colors */
     .card1 { background: #FFF3E0; }
     .card2 { background: #FCE4EC; }
@@ -370,8 +385,8 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 70px;
-        height: 70px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background: linear-gradient(135deg, #808080, #696969);
         color: white;
@@ -379,9 +394,6 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         transition: all 0.3s ease;
     }
-   .dashboard-item {   
-    width: 300px;
-}
 
     .dashboard-item:hover .dashboard-icon {
         transform: scale(1.1) rotate(5deg);
@@ -567,12 +579,12 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
         75% { transform: translateX(2px); }
     }
     .user-p img {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
     }
 
     /* Responsive Design */

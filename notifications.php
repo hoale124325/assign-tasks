@@ -10,151 +10,328 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thông Báo</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Thông Báo | Hệ Thống Quản Lý</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .notification-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-color: #e9ecef;
         }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #212529;
+            line-height: 1.6;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .content-wrapper {
+            flex: 1;
+            padding: 30px;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .page-title i {
+            color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a5bd9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 108, 247, 0.2);
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .notification-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .notification-table thead {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+        
+        .notification-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .notification-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+        
+        .notification-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .notification-table tr:hover {
+            background-color: #f8fafd;
+        }
+        
+        .notification-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-info {
+            background-color: rgba(23, 162, 184, 0.1);
+            color: var(--info-color);
+        }
+        
+        .badge-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .badge-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .badge-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--secondary-color);
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+        
         .table-container {
             max-height: 600px;
             overflow-y: auto;
         }
-        .table-header {
-            position: sticky;
-            top: 0;
-            background: #ffffff;
-            z-index: 10;
+        
+        .refresh-icon {
+            transition: transform 0.5s ease;
         }
-        .notification-row:hover {
-            background-color: #f9fafb;
-            transition: background-color 0.2s ease;
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .status-tag {
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-        .refresh-btn {
-            transition: transform 0.2s ease, background-color 0.2s ease;
-        }
-        .refresh-btn:hover {
+        
+        .refresh-icon.rotate {
             transform: rotate(360deg);
-            background-color: #3b82f6;
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 20px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .notification-table {
+                display: block;
+                overflow-x: auto;
+            }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen font-sans">
-    <div class="flex h-screen">
+<body>
+    <div class="app-container">
         <!-- Sidebar -->
         <?php include "inc/nav.php" ?>
         
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="main-content">
             <!-- Header -->
             <?php include "inc/header.php" ?>
             
-            <!-- Main Section -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto p-6">
-                <div class="container mx-auto">
-                    <div class="flex justify-between items-center mb-8">
-                        <h1 class="text-4xl font-bold text-gray-800 flex items-center gap-3">
-                            <i class="fas fa-bell"></i>
-                            Tất Cả Thông Báo
-                        </h1>
-                        <button onclick="location.reload();" class="refresh-btn inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:text-white">
-                            <i class="fas fa-sync-alt mr-2"></i> Làm Mới
-                        </button>
+            <!-- Content -->
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="fas fa-bell"></i>
+                        Thông Báo Của Tôi
+                    </h1>
+                    <button id="refreshBtn" class="btn btn-primary">
+                        <i id="refreshIcon" class="fas fa-sync-alt refresh-icon"></i>
+                        Làm Mới
+                    </button>
+                </div>
+                
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="alert alert-success" style="background-color: rgba(40, 167, 69, 0.1); color: var(--success-color); padding: 15px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--success-color);">
+                        <i class="fas fa-check-circle"></i>
+                        <?php echo htmlspecialchars(stripcslashes($_GET['success'])); ?>
                     </div>
-                    
-                    <!-- Success Message -->
-                    <?php if (isset($_GET['success'])): ?>
-                        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6 flex items-center gap-3 text-green-700 fade-in">
-                            <i class="fas fa-check-circle"></i>
-                            <?php echo htmlspecialchars(stripcslashes($_GET['success'])); ?>
+                <?php endif; ?>
+                
+                <div class="card">
+                    <?php if ($notifications != 0): ?>
+                        <div class="table-container">
+                            <table class="notification-table">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Nội Dung</th>
+                                        <th>Loại</th>
+                                        <th>Thời Gian</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $i = 0; foreach ($notifications as $notification): ?>
+                                        <tr>
+                                            <td><?= ++$i ?></td>
+                                            <td><?= htmlspecialchars($notification['message']) ?></td>
+                                            <td>
+                                                <?php
+                                                $type = $notification['type'];
+                                                $badgeClass = '';
+                                                $badgeText = $type;
+                                                
+                                                switch ($type) {
+                                                    case 'info':
+                                                        $badgeClass = 'badge-info';
+                                                        $badgeText = 'Thông tin';
+                                                        break;
+                                                    case 'warning':
+                                                        $badgeClass = 'badge-warning';
+                                                        $badgeText = 'Cảnh báo';
+                                                        break;
+                                                    case 'error':
+                                                        $badgeClass = 'badge-danger';
+                                                        $badgeText = 'Lỗi';
+                                                        break;
+                                                    default:
+                                                        $badgeClass = 'badge-info';
+                                                }
+                                                ?>
+                                                <span class="notification-badge <?= $badgeClass ?>">
+                                                    <?= $badgeText ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $date = new DateTime($notification['date']);
+                                                echo $date->format(' d/m/Y');
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>Không có thông báo nào</h3>
+                            <p>Khi có thông báo mới, chúng sẽ xuất hiện tại đây</p>
                         </div>
                     <?php endif; ?>
-
-                    <!-- Notification Table -->
-                    <div class="notification-container fade-in">
-                        <?php if ($notifications != 0): ?>
-                            <div class="table-container">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead class="table-header">
-                                        <tr>
-                                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">STT</th>
-                                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Thông Điệp</th>
-                                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Loại</th>
-                                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">Ngày</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        <?php $i = 0; foreach ($notifications as $notification): ?>
-                                            <tr class="notification-row">
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><?= ++$i ?></td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?php echo htmlspecialchars($notification['message']); ?></td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <?php
-                                                    $type = $notification['type'];
-                                                    $tagClass = '';
-                                                    $tagText = $type;
-                                                    if ($type == "info") {
-                                                        $tagClass = "bg-blue-100 text-blue-800";
-                                                        $tagText = "Thông Tin";
-                                                    } elseif ($type == "warning") {
-                                                        $tagClass = "bg-yellow-100 text-yellow-800";
-                                                        $tagText = "Cảnh Báo";
-                                                    } elseif ($type == "error") {
-                                                        $tagClass = "bg-red-100 text-red-800";
-                                                        $tagText = "Lỗi";
-                                                    }
-                                                    ?>
-                                                    <span class="status-tag <?= $tagClass ?>"><?= htmlspecialchars($tagText) ?></span>
-                                                </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                    <?php
-                                                    $date = new DateTime($notification['date']);
-                                                    echo $date->format('d/m/Y H:i');
-                                                    ?>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php else: ?>
-                            <div class="text-center py-12 text-gray-500">
-                                <i class="fas fa-bell-slash text-4xl mb-4"></i>
-                                <h3 class="text-lg font-medium">Bạn không có thông báo nào</h3>
-                                <p class="text-sm">Hãy kiểm tra lại sau!</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
                 </div>
-            </main>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const active = document.querySelector("#navList li:nth-child(4)");
-            if (active) {
-                active.classList.add("bg-blue-100", "text-blue-700");
+        document.addEventListener('DOMContentLoaded', function() {
+            // Active menu item
+            const activeItem = document.querySelector("#navList li:nth-child(4)");
+            if (activeItem) {
+                activeItem.classList.add("active");
             }
+            
+            // Refresh button animation
+            const refreshBtn = document.getElementById('refreshBtn');
+            const refreshIcon = document.getElementById('refreshIcon');
+            
+            refreshBtn.addEventListener('click', function() {
+                refreshIcon.classList.add('rotate');
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            });
         });
     </script>
 </body>

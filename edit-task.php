@@ -23,230 +23,283 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chỉnh Sửa Nhiệm Vụ</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>Chỉnh Sửa Nhiệm Vụ | Hệ Thống Quản Lý</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --primary-hover: #5649c0;
+            --success-color: #00b894;
+            --danger-color: #d63031;
+            --warning-color: #fdcb6e;
+            --text-dark: #2d3436;
+            --text-medium: #636e72;
+            --text-light: #b2bec3;
+            --bg-light: #f5f6fa;
+            --border-color: #dfe6e9;
+            --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(145deg, #f4f5f7 0%, #e2e8f0 100%);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            color: #1a202c;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
-        .body {
+        .body-container {
             display: flex;
             min-height: calc(100vh - 80px);
         }
 
-        .section-1 {
+        .edit-task-container {
             flex: 1;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 32px;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
+            padding: 2rem;
+            max-width: 900px;
+            margin: 2rem auto;
         }
 
-        .title {
-            font-size: 32px;
-            font-weight: 700;
-            color: #2d3748;
-            margin: 0 0 32px 0;
+        .task-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .page-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            border-bottom: 2px solid #805ad5;
-            padding-bottom: 12px;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-color);
         }
 
-        .title a {
-            font-size: 16px;
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.75rem;
+            color: var(--text-dark);
             font-weight: 600;
-            color: #805ad5;
+        }
+
+        .page-title i {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-color);
             text-decoration: none;
+            font-weight: 500;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .title a:hover {
-            color: #6b46c1;
-            transform: translateX(4px);
+        .back-link:hover {
+            color: var(--primary-hover);
+            transform: translateX(-3px);
         }
 
-        .title i {
-            margin-right: 12px;
-            color: #805ad5;
-            font-size: 36px;
-        }
-
-        .form-1 {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .input-holder {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            position: relative;
-        }
-
-        .input-holder label {
-            font-size: 16px;
-            font-weight: 600;
-            color: #2d3748;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-holder label i {
-            color: #805ad5;
-            font-size: 18px;
-        }
-
-        .input-1 {
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
+        .alert {
+            padding: 1rem 1.5rem;
             border-radius: 8px;
-            font-size: 16px;
-            color: #2d3748;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .alert-danger {
+            background-color: rgba(214, 48, 49, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-success {
+            background-color: rgba(0, 184, 148, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert i {
+            font-size: 1.2rem;
+        }
+
+        .task-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--primary-color);
+            width: 20px;
+            text-align: center;
+        }
+
+        .form-control {
             width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--text-dark);
             transition: all 0.3s ease;
-            background: #f7fafc;
+            background-color: white;
         }
 
-        .input-1:focus {
+        .form-control:focus {
             outline: none;
-            border-color: #805ad5;
-            box-shadow: 0 0 0 4px rgba(128, 90, 213, 0.15);
-            background: #ffffff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
         }
 
-        textarea.input-1 {
-            resize: vertical;
+        textarea.form-control {
             min-height: 120px;
-            max-height: 300px;
+            resize: vertical;
         }
 
-        select.input-1 {
+        select.form-control {
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234a5568'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23636e72' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-            padding-right: 40px;
+            background-position: right 1rem center;
+            background-size: 12px;
         }
 
-        .edit-btn {
-            padding: 14px 32px;
-            background: #805ad5;
-            color: white;
-            border: none;
+        .form-actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-            align-self: flex-start;
-            display: flex;
+            transition: all 0.2s ease;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
+            border: none;
         }
 
-        .edit-btn:hover {
-            background: #6b46c1;
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(107, 70, 193, 0.4);
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
         }
 
-        .edit-btn i {
-            font-size: 18px;
+        .btn-secondary {
+            background-color: white;
+            color: var(--text-medium);
+            border: 1px solid var(--border-color);
         }
 
-        .danger, .success {
-            padding: 16px 24px;
-            border-radius: 8px;
-            font-size: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .btn-secondary:hover {
+            background-color: #f8f9fa;
+            border-color: var(--text-light);
         }
 
-        .danger {
-            background: #fef1f1;
-            color: #c53030;
-            border-left: 4px solid #c53030;
+        .status-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
-        .success {
-            background: #e6fffa;
-            color: #2f855a;
-            border-left: 4px solid #2f855a;
+        .status-pending {
+            background-color: rgba(253, 203, 110, 0.2);
+            color: #e17055;
         }
 
-        .danger i, .success i {
-            font-size: 20px;
+        .status-in_progress {
+            background-color: rgba(129, 236, 236, 0.2);
+            color: #00cec9;
+        }
+
+        .status-completed {
+            background-color: rgba(0, 184, 148, 0.2);
+            color: var(--success-color);
         }
 
         @media (max-width: 768px) {
-            .section-1 {
-                margin: 24px 16px;
-                padding: 24px;
+            .task-form {
+                grid-template-columns: 1fr;
             }
-
-            .title {
-                font-size: 24px;
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .form-actions {
+                grid-column: span 1;
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
             }
-
-            .title a {
-                font-size: 14px;
+            
+            .edit-task-container {
+                padding: 1rem;
             }
-
-            .input-1 {
-                font-size: 14px;
-                padding: 12px;
+            
+            .task-card {
+                padding: 1.5rem;
             }
-
-            .input-holder label {
-                font-size: 14px;
-            }
-
-            .edit-btn {
-                width: 100%;
-                justify-content: center;
+            
+            .page-title {
+                font-size: 1.5rem;
             }
         }
 
         @media (max-width: 480px) {
-            .section-1 {
-                margin: 16px;
-                padding: 16px;
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
             }
-
-            .title {
-                font-size: 20px;
-            }
-
-            .title i {
-                font-size: 28px;
+            
+            .task-card {
+                padding: 1.25rem;
             }
         }
     </style>
@@ -254,74 +307,133 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
 <body>
     <input type="checkbox" id="checkbox">
     <?php include "inc/header.php" ?>
-    <div class="body">
+    <div class="body-container">
         <?php include "inc/nav.php" ?>
-        <section class="section-1">
-            <h4 class="title">
-                <span><i class="fas fa-edit"></i> Chỉnh Sửa Nhiệm Vụ</span>
-                <a href="tasks.php"><i class="fas fa-list"></i> Danh Sách Nhiệm Vụ</a>
-            </h4>
-            <form class="form-1" method="POST" action="app/update-task.php">
+        <main class="edit-task-container">
+            <div class="task-card">
+                <div class="page-header">
+                    <h1 class="page-title">
+                        <i class="fas fa-edit"></i>
+                        <span>Chỉnh Sửa Nhiệm Vụ</span>
+                    </h1>
+                    <a href="tasks.php" class="back-link">
+                        <i class="fas fa-arrow-left"></i>
+                        Quay lại danh sách
+                    </a>
+                </div>
+
                 <?php if (isset($_GET['error'])) { ?>
-                    <div class="danger" role="alert">
+                    <div class="alert alert-danger" role="alert">
                         <i class="fas fa-exclamation-circle"></i>
                         <?php echo stripcslashes($_GET['error']); ?>
                     </div>
                 <?php } ?>
 
                 <?php if (isset($_GET['success'])) { ?>
-                    <div class="success" role="alert">
+                    <div class="alert alert-success" role="alert">
                         <i class="fas fa-check-circle"></i>
                         <?php echo stripcslashes($_GET['success']); ?>
                     </div>
                 <?php } ?>
 
-                <div class="input-holder">
-                    <label for="title"><i class="fas fa-heading"></i> Tiêu Đề</label>
-                    <input type="text" name="title" id="title" class="input-1" placeholder="Nhập tiêu đề nhiệm vụ" value="<?=htmlspecialchars($task['title'])?>" required>
-                </div>
-                <div class="input-holder">
-                    <label for="description"><i class="fas fa-align-left"></i> Mô Tả</label>
-                    <textarea name="description" id="description" rows="6" class="input-1" placeholder="Nhập mô tả nhiệm vụ" required><?=htmlspecialchars($task['description'])?></textarea>
-                </div>
-                <div class="input-holder">
-                    <label for="due_date"><i class="fas fa-calendar-alt"></i> Ngày Hết Hạn</label>
-                    <input type="date" name="due_date" id="due_date" class="input-1" value="<?=htmlspecialchars($task['due_date'] ?? '')?>">
-                </div>
-                <div class="input-holder">
-                    <label for="assigned_to"><i class="fas fa-user"></i> Phân Công Cho</label>
-                    <?php if ($users != 0 && !empty($users)) { ?>
-                        <select name="assigned_to" id="assigned_to" class="input-1" required>
-                            <option value="0">Chọn Nhân Viên</option>
-                            <?php foreach ($users as $user) {
-                                $selected = $task['assigned_to'] == $user['id'] ? 'selected' : '';
-                            ?>
-                                <option value="<?= $user['id'] ?>" <?= $selected ?>><?= htmlspecialchars($user['full_name']) ?></option>
-                            <?php } ?>
+                <form class="task-form" method="POST" action="app/update-task.php">
+                    <div class="form-group full-width">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading"></i>
+                            Tiêu đề nhiệm vụ
+                        </label>
+                        <input type="text" name="title" id="title" class="form-control" 
+                               placeholder="Nhập tiêu đề nhiệm vụ" 
+                               value="<?=htmlspecialchars($task['title'])?>" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-align-left"></i>
+                            Mô tả chi tiết
+                        </label>
+                        <textarea name="description" id="description" class="form-control" 
+                                  rows="5" placeholder="Mô tả chi tiết nhiệm vụ..." required><?=htmlspecialchars($task['description'])?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="due_date" class="form-label">
+                            <i class="fas fa-calendar-day"></i>
+                            Ngày hết hạn
+                        </label>
+                        <input type="date" name="due_date" id="due_date" class="form-control" 
+                               value="<?=htmlspecialchars($task['due_date'] ?? '')?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status" class="form-label">
+                            <i class="fas fa-tasks"></i>
+                            Trạng thái
+                        </label>
+                        <select name="status" id="status" class="form-control" required>
+                            <option value="pending" <?= $task['status'] == 'pending' ? 'selected' : '' ?>>Đang chờ</option>
+                            <option value="in_progress" <?= $task['status'] == 'in_progress' ? 'selected' : '' ?>>Đang thực hiện</option>
+                            <option value="completed" <?= $task['status'] == 'completed' ? 'selected' : '' ?>>Hoàn thành</option>
                         </select>
-                    <?php } else { ?>
-                        <p class="danger" role="alert"><i class="fas fa-exclamation-circle"></i> Không có nhân viên nào để phân công.</p>
-                    <?php } ?>
-                </div>
-                <div class="input-holder">
-                    <label for="status"><i class="fas fa-check-circle"></i> Trạng Thái</label>
-                    <select name="status" id="status" class="input-1" required>
-                        <option value="pending" <?= $task['status'] == 'pending' ? 'selected' : '' ?>>Đang Chờ</option>
-                        <option value="in_progress" <?= $task['status'] == 'in_progress' ? 'selected' : '' ?>>Đang Thực Hiện</option>
-                        <option value="completed" <?= $task['status'] == 'completed' ? 'selected' : '' ?>>Hoàn Thành</option>
-                    </select>
-                </div>
-                <input type="hidden" name="id" value="<?=htmlspecialchars($task['id'])?>">
-                <button class="edit-btn"><i class="fas fa-save"></i> Cập Nhật Nhiệm Vụ</button>
-            </form>
-        </section>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="assigned_to" class="form-label">
+                            <i class="fas fa-user-tag"></i>
+                            Phân công cho
+                        </label>
+                        <?php if ($users != 0 && !empty($users)) { ?>
+                            <select name="assigned_to" id="assigned_to" class="form-control" required>
+                                <option value="">Chọn nhân viên</option>
+                                <?php foreach ($users as $user) {
+                                    $selected = $task['assigned_to'] == $user['id'] ? 'selected' : '';
+                                ?>
+                                    <option value="<?= $user['id'] ?>" <?= $selected ?>>
+                                        <?= htmlspecialchars($user['full_name']) ?>
+                                    </option>
+                                <?php } ?>
+                            </select>
+                        <?php } else { ?>
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Không có nhân viên nào để phân công
+                            </div>
+                        <?php } ?>
+                    </div>
+
+                    <input type="hidden" name="id" value="<?=htmlspecialchars($task['id'])?>">
+
+                    <div class="form-actions">
+                        <a href="tasks.php" class="btn btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Hủy bỏ
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Cập nhật nhiệm vụ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
     </div>
 
     <script type="text/javascript">
+        // Highlight active menu item
         const active = document.querySelector("#navList li:nth-child(4)");
         if (active) {
             active.classList.add("active");
         }
+
+        // Enhance date input with today's date as default if empty
+        document.addEventListener('DOMContentLoaded', function() {
+            const dueDateInput = document.getElementById('due_date');
+            if (dueDateInput && !dueDateInput.value) {
+                const today = new Date();
+                const formattedDate = today.toISOString().substr(0, 10);
+                dueDateInput.value = formattedDate;
+            }
+        });
     </script>
 </body>
 </html>
@@ -329,4 +441,4 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
     $em = "Vui lòng đăng nhập trước";
     header("Location: login.php?error=" . urlencode($em));
     exit();
-}
+} ?>

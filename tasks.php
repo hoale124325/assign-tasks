@@ -5,23 +5,45 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
     include "app/Model/Task.php";
     include "app/Model/User.php";
     
+    // Xử lý các tham số lọc
+    $include_completed = isset($_GET['show_completed']) && $_GET['show_completed'] == 'true';
+    $due_date_filter = isset($_GET['due_date']) ? $_GET['due_date'] : '';
+    $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+    
     $text = "Tất Cả Nhiệm Vụ";
-    if (isset($_GET['due_date']) && $_GET['due_date'] == "Due Today") {
-        $text = "Đến Hạn Hôm Nay";
-        $tasks = get_all_tasks_due_today($conn);
-        $num_task = count_tasks_due_today($conn);
-    } else if (isset($_GET['due_date']) && $_GET['due_date'] == "Overdue") {
-        $text = "Quá Hạn";
-        $tasks = get_all_tasks_overdue($conn);
-        $num_task = count_tasks_overdue($conn);
-    } else if (isset($_GET['due_date']) && $_GET['due_date'] == "No Deadline") {
-        $text = "Không Có Hạn Chót";
-        $tasks = get_all_tasks_NoDeadline($conn);
-        $num_task = count_tasks_NoDeadline($conn);
-    } else {
-        $tasks = get_all_tasks($conn);
-        $num_task = count_tasks($conn);
+    
+    // Áp dụng các bộ lọc
+    switch ($due_date_filter) {
+        case "Due Today":
+            $text = "Đến Hạn Hôm Nay";
+            $tasks = get_all_tasks_due_today($conn, $include_completed);
+            $num_task = count_tasks_due_today($conn, $include_completed);
+            break;
+        case "Overdue":
+            $text = "Quá Hạn";
+            $tasks = get_all_tasks_overdue($conn, $include_completed);
+            $num_task = count_tasks_overdue($conn, $include_completed);
+            break;
+        case "No Deadline":
+            $text = "Không Có Hạn Chót";
+            $tasks = get_all_tasks_NoDeadline($conn, $include_completed);
+            $num_task = count_tasks_NoDeadline($conn, $include_completed);
+            break;
+        default:
+            $tasks = get_all_tasks($conn, $include_completed);
+            $num_task = count_tasks($conn, $include_completed);
     }
+    
+    // Áp dụng tìm kiếm nếu có
+    if (!empty($search_query)) {
+        $tasks = array_filter($tasks, function($task) use ($search_query) {
+            return stripos($task['title'], $search_query) !== false || 
+                   stripos($task['description'], $search_query) !== false;
+        });
+        $num_task = count($tasks);
+        $text = "Kết quả tìm kiếm cho '$search_query'";
+    }
+    
     $users = get_all_users($conn);
     
     // Tạo mảng ánh xạ id => full_name
@@ -162,9 +184,48 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
             box-shadow: 0 2px 8px rgba(72, 187, 120, 0.2);
         }
 
+        .alert-error {
+            background: #f56565;
+            color: white;
+        }
+
         .alert i {
             margin-right: 10px;
             font-size: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            margin-bottom: 24px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: #805ad5;
+        }
+
+        .search-btn {
+            background: #805ad5;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .search-btn:hover {
+            background: #6b46c1;
         }
 
         .table-container {
@@ -226,7 +287,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
 
         .task-description {
             color: #718096;
-            max-width: 250px;
+            max-width: 150px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -326,6 +387,27 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
             transform: translateY(-1px);
         }
 
+        .file-btn {
+            background: #4299e1;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .file-btn:hover {
+            background: #3182ce;
+            transform: translateY(-1px);
+        }
+
+        .file-btn i {
+            margin-right: 6px;
+        }
+
         .empty-state {
             text-align: center;
             padding: 48px 20px;
@@ -421,32 +503,57 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
                         Tạo Nhiệm Vụ Mới
                     </a>
                     
-                    <a href="tasks.php" class="nav-btn filter-btn <?= !isset($_GET['due_date']) ? 'current-filter' : '' ?>">
+                    <a href="tasks.php" class="nav-btn filter-btn <?= empty($due_date_filter) ? 'current-filter' : '' ?>">
                         <i class="fas fa-list"></i>
                         Tất Cả Nhiệm Vụ
                     </a>
                     
-                    <a href="tasks.php?due_date=Due Today" class="nav-btn filter-btn <?= (isset($_GET['due_date']) && $_GET['due_date'] == 'Due Today') ? 'current-filter' : '' ?>">
+                    <a href="tasks.php?due_date=Due Today" class="nav-btn filter-btn <?= ($due_date_filter == 'Due Today') ? 'current-filter' : '' ?>">
                         <i class="fas fa-clock"></i>
                         Đến Hạn Hôm Nay
                     </a>
                     
-                    <a href="tasks.php?due_date=Overdue" class="nav-btn filter-btn <?= (isset($_GET['due_date']) && $_GET['due_date'] == 'Overdue') ? 'current-filter' : '' ?>">
+                    <a href="tasks.php?due_date=Overdue" class="nav-btn filter-btn <?= ($due_date_filter == 'Overdue') ? 'current-filter' : '' ?>">
                         <i class="fas fa-exclamation-triangle"></i>
                         Quá Hạn
                     </a>
                     
-                    <a href="tasks.php?due_date=No Deadline" class="nav-btn filter-btn <?= (isset($_GET['due_date']) && $_GET['due_date'] == 'No Deadline') ? 'current-filter' : '' ?>">
+                    <a href="tasks.php?due_date=No Deadline" class="nav-btn filter-btn <?= ($due_date_filter == 'No Deadline') ? 'current-filter' : '' ?>">
                         <i class="fas fa-calendar-times"></i>
                         Không Có Hạn Chót
+                    </a>
+                    
+                    <a href="tasks.php?show_completed=true" class="nav-btn filter-btn <?= $include_completed ? 'current-filter' : '' ?>">
+                        <i class="fas fa-check-circle"></i>
+                        Đã Hoàn Thành
+                    </a>
+                    
+                    <a href="tasks.php?show_completed=false" class="nav-btn filter-btn <?= !$include_completed ? 'current-filter' : '' ?>">
+                        <i class="fas fa-times-circle"></i>
+                        Đang Thực Hiện
                     </a>
                 </div>
             </div>
 
+            <!-- Ô tìm kiếm -->
+            <form method="GET" action="tasks.php" class="search-box">
+                <input type="text" name="search" class="search-input" placeholder="Tìm kiếm nhiệm vụ..." 
+                       value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+                <?php if (!empty($due_date_filter)): ?>
+                    <input type="hidden" name="due_date" value="<?= htmlspecialchars($due_date_filter) ?>">
+                <?php endif; ?>
+                <?php if (isset($_GET['show_completed'])): ?>
+                    <input type="hidden" name="show_completed" value="<?= htmlspecialchars($_GET['show_completed']) ?>">
+                <?php endif; ?>
+            </form>
+
             <div class="stats-section">
                 <div class="stats-info">
-                    <h2><?=$text?></h2>
-                    <p>Tổng cộng <?=$num_task?> nhiệm vụ</p>
+                    <h2><?= htmlspecialchars($text) ?></h2>
+                    <p>Tổng cộng <?= $num_task ?> nhiệm vụ</p>
                 </div>
                 <div class="stats-icon">
                     <i class="fas fa-chart-pie"></i>
@@ -456,11 +563,18 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
             <?php if (isset($_GET['success'])) { ?>
                 <div class="alert">
                     <i class="fas fa-check-circle"></i>
-                    <?php echo stripcslashes($_GET['success']); ?>
+                    <?= htmlspecialchars(stripcslashes($_GET['success'])) ?>
+                </div>
+            <?php } ?>
+            
+            <?php if (isset($_GET['error'])) { ?>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <?= htmlspecialchars(stripcslashes($_GET['error'])) ?>
                 </div>
             <?php } ?>
 
-            <?php if ($tasks != 0) { ?>
+            <?php if ($tasks != 0 && !empty($tasks)) { ?>
                 <div class="table-container">
                     <div class="table-header">
                         <h3><i class="fas fa-table"></i> Danh Sách Nhiệm Vụ</h3>
@@ -472,22 +586,24 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
                                 <th>#</th>
                                 <th>Tiêu Đề</th>
                                 <th>Mô Tả</th>
-                                <th>Phân Công</th>
+                                <th>Người Nhận</th>
                                 <th>Hạn Chót</th>
                                 <th>Trạng Thái</th>
+                                <th>File Đính Kèm</th>
+                                <th>File Đã Chỉnh Sửa</th>
                                 <th>Thao Tác</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $i=0; foreach ($tasks as $task) { ?>
+                            <?php foreach ($tasks as $index => $task) { ?>
                             <tr>
-                                <td><strong><?=++$i?></strong></td>
+                                <td><strong><?= $index + 1 ?></strong></td>
                                 <td>
-                                    <div class="task-title"><?=htmlspecialchars($task['title'])?></div>
+                                    <div class="task-title"><?= htmlspecialchars($task['title']) ?></div>
                                 </td>
                                 <td>
-                                    <div class="task-description" title="<?=htmlspecialchars($task['description'])?>">
-                                        <?=htmlspecialchars($task['description'])?>
+                                    <div class="task-description" title="<?= htmlspecialchars($task['description']) ?>">
+                                        <?= htmlspecialchars($task['description']) ?>
                                     </div>
                                 </td>
                                 <td>
@@ -499,50 +615,51 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
                                 <td>
                                     <?php 
                                         if (empty($task['due_date']) || $task['due_date'] == '0000-00-00') {
-                                            echo '<span class="due-date">Không có hạn chót</span>';
+                                            echo '<span class="due-date">Không hạn</span>';
                                         } else {
                                             $due_date = date('d/m/Y', strtotime($task['due_date']));
                                             $today = date('Y-m-d');
-                                            $class = '';
-                                            if ($task['due_date'] < $today) {
-                                                $class = 'overdue';
-                                            } else if ($task['due_date'] == $today) {
-                                                $class = 'today';
-                                            }
+                                            $class = ($task['due_date'] < $today) ? 'overdue' : (($task['due_date'] == $today) ? 'today' : '');
                                             echo '<span class="due-date '.$class.'">'.$due_date.'</span>';
                                         }
                                     ?>
                                 </td>
                                 <td>
                                     <?php 
-                                        $status_class = '';
-                                        $status_text = '';
-                                        if ($task['status'] == "pending") {
-                                            $status_class = 'status-pending';
-                                            $status_text = 'Đang Chờ';
-                                        } elseif ($task['status'] == "in_progress") {
-                                            $status_class = 'status-progress';
-                                            $status_text = 'Đang Thực Hiện';
-                                        } elseif ($task['status'] == "completed") {
-                                            $status_class = 'status-completed';
-                                            $status_text = 'Hoàn Thành';
-                                      
-                                        }
+                                        $status = [
+                                            "pending" => ['class' => 'status-pending', 'text' => 'Đang Chờ'],
+                                            "in_progress" => ['class' => 'status-progress', 'text' => 'Đang Làm'],
+                                            "completed" => ['class' => 'status-completed', 'text' => 'Hoàn Thành']
+                                        ][$task['status']] ?? ['class' => '', 'text' => ''];
                                     ?>
-                                    <span class="status-badge <?=htmlspecialchars($status_class)?>">
-                                        <?=htmlspecialchars($status_text)?>
-                                    </span>
+                                    <span class="status-badge <?= $status['class'] ?>"><?= $status['text'] ?></span>
+                                </td>
+                                <td>
+                                    <?php if (!empty($task['attachment'])): ?>
+                                        <a href="download.php?file=<?= urlencode($task['attachment']) ?>&task_id=<?= $task['id'] ?>" class="file-btn">
+                                            <i class="fas fa-paperclip"></i> Tải
+                                        </a>
+                                    <?php else: ?>
+                                        <span style="color: #a0aec0;">Không có</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if (!empty($task['edited_file'])): ?>
+                                        <a href="download.php?file=<?= urlencode($task['edited_file']) ?>&task_id=<?= $task['id'] ?>" class="file-btn" style="background: #ecc94b;">
+                                            <i class="fas fa-edit"></i> Xem
+                                        </a>
+                                    <?php else: ?>
+                                        <span style="color: #a0aec0;">Chưa có</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="edit-task.php?id=<?=htmlspecialchars($task['id'])?>" class="action-btn edit-btn">
-                                            <i class="fas fa-edit"></i>
-                                            Sửa
+                                        <a href="edit-task.php?id=<?= $task['id'] ?>" class="action-btn edit-btn">
+                                            <i class="fas fa-edit"></i> Sửa
                                         </a>
-                                        <a href="delete-task.php?id=<?=htmlspecialchars($task['id'])?>" class="action-btn delete-btn" 
+                                        <a href="delete-task.php?id=<?= $task['id'] ?>" class="action-btn delete-btn" 
                                            onclick="return confirm('Bạn có chắc muốn xóa nhiệm vụ này?')">
-                                            <i class="fas fa-trash"></i>
-                                            Xóa
+                                            <i class="fas fa-trash"></i> Xóa
                                         </a>
                                     </div>
                                 </td>
@@ -564,16 +681,27 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
     </div>
 
     <script type="text/javascript">
-        const active = document.querySelector("#navList li:nth-child(4)");
-        if (active) {
-            active.classList.add("active");
-        }
+        // Tự động ẩn thông báo sau 5 giây
+        setTimeout(() => {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
 
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                if (!confirm('Bạn có chắc chắn muốn xóa nhiệm vụ này không?')) {
-                    e.preventDefault();
-                }
+        // Highlight menu active
+        document.addEventListener('DOMContentLoaded', function() {
+            const activeNav = document.querySelector("#navList li:nth-child(4)");
+            if (activeNav) activeNav.classList.add("active");
+            
+            // Xác nhận trước khi xóa
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    if (!confirm('Bạn có chắc chắn muốn xóa nhiệm vụ này không?')) {
+                        e.preventDefault();
+                    }
+                });
             });
         });
     </script>
@@ -583,4 +711,4 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
     $em = "Vui lòng đăng nhập trước";
     header("Location: login.php?error=" . urlencode($em));
     exit();
-}
+} ?>
